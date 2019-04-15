@@ -26,7 +26,8 @@ import json
 from django.db.models import Sum
 import datetime
 gmaps = googlemaps.Client(key='AIzaSyBH5afRK4l9rr_HOR_oGJ5Dsiw2ldUzLv0')
-
+from django.shortcuts import render_to_response
+from django.views.decorators.cache import cache_page
 
 @login_required()
 @communitypartner_required()
@@ -453,7 +454,9 @@ def SearchForProjectAdd(request,pk):
 
 
 # List Projects for Public View
+timeout = 600 # 10 min
 
+@cache_page(timeout)
 def projectsPublicReport(request):
     projects = ProjectFilter(request.GET, queryset=Project.objects.all())
     missions = ProjectMissionFilter(request.GET, queryset=ProjectMission.objects.all())
