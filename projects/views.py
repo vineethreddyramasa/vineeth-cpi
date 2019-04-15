@@ -398,7 +398,7 @@ def project_edit_new(request,pk):
 @login_required()
 @login_required()
 def SearchForProject(request):
-    cache._cache.clear()
+    
     cache._expire_info.clear()
     
     data_definition=DataDefinition.objects.all()
