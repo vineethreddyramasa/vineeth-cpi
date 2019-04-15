@@ -406,7 +406,7 @@ def SearchForProject(request):
     projects_list = []
 
     if request.method == "GET":
-        cache.get()
+        print("tEsrs")
         cache.clear()
         # To get list of all Projects frm the Database
         projects = list(Project.objects.all())
