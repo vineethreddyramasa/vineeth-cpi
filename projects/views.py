@@ -399,14 +399,15 @@ def project_edit_new(request,pk):
 @login_required()
 def SearchForProject(request):
     
-    cache._expire_info.clear()
+    
     
     data_definition=DataDefinition.objects.all()
 
     projects_list = []
 
     if request.method == "GET":
-
+        cache.get()
+        cache.clear()
         # To get list of all Projects frm the Database
         projects = list(Project.objects.all())
 
