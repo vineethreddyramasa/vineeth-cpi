@@ -400,7 +400,7 @@ def project_edit_new(request,pk):
 @login_required()
 def SearchForProject(request):
     
-    os.system('cache.clear()')
+    os.system(cache.clear())
     
     
     data_definition=DataDefinition.objects.all()
@@ -408,8 +408,7 @@ def SearchForProject(request):
     projects_list = []
 
     if request.method == "GET":
-        print("tEsrs")
-        cache.clear()
+        
         # To get list of all Projects frm the Database
         projects = list(Project.objects.all())
 
