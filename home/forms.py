@@ -74,8 +74,11 @@ class CampususerForm(forms.ModelForm):
 
     def clean_email(self):
         email = self.cleaned_data['email']
-        if "edu" != email.split("@")[1].split('.')[1]:
-            raise forms.ValidationError("Please use .edu email ")
+        if ".edu" not in email:
+            raise forms.ValidationError("Please use your campus email (.edu) for the registration of a Campus Partner User.")
+        if User.objects.filter(email__exact=email).exists():
+            raise forms.ValidationError(
+                'A user with this email address is already registered. Once logged in, the user can be associated to multiple campus partners through the Organization portal.')
         return email
 
     def clean_password2(self):
@@ -184,8 +187,8 @@ class userUpdateForm(forms.ModelForm):
 
     def clean_email(self):
         email = self.cleaned_data['email']
-        if "edu" != email.split("@")[1].split('.')[1]:
-            raise forms.ValidationError("Please use .edu email ")
+        if ".edu" not in email:
+            raise forms.ValidationError("Please use your campus email (.edu) inorder to update your profile.")
         return email
 
 
@@ -410,3 +413,34 @@ class ContactForm(forms.Form):
         self.fields['topic'].widget.attrs['placeholder'] = 'Subject'
         #self.fields['content'].label = "Message"
         self.fields['content'].widget.attrs['placeholder'] = 'Message'
+
+class CommunityPartnerUserInvite(forms.ModelForm):
+    email = forms.EmailField(label='Email')
+    class Meta:
+        model = User
+        fields = ('first_name','last_name', 'email')
+
+class CommunityPartnerUserCompleteRegistration(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ('first_name', 'last_name', 'email')
+    password = forms.CharField(label='Password', widget=forms.PasswordInput)
+    password2 = forms.CharField(label='Confirm Password', widget=forms.PasswordInput)
+
+    def clean_password2(self):
+        pas = self.cleaned_data['password']
+        cd = self.cleaned_data['password2']
+        MIN_LENGTH = 8
+        special_characters = "[~\!@#\$%\^&\*\(\)_\+{}\":;'\[\]]"
+        if pas and cd:
+            if pas != cd:
+                raise forms.ValidationError('Passwords don\'t match.')
+            else:
+                if len(pas) < MIN_LENGTH:
+                    raise forms.ValidationError("Password should have atleast %d characters" % MIN_LENGTH)
+                if pas.isdigit():
+                    raise forms.ValidationError("Password should not be all numeric")
+                if pas.isalpha():
+                    raise forms.ValidationError("Password should have atleast one digit")
+                if not any(char in special_characters for char in pas):
+                    raise forms.ValidationError("Password should have atleast one Special Character")
