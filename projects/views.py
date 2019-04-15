@@ -519,11 +519,11 @@ def projectsPublicReport(request):
                                 data['communityPartner'] = list_comm
         if data:
             projectsData.append(data)
-    view_keys['proj'] = learn_cache_key(request, response)
-    return render(request, 'reports/projects_public_view.html', {'projects': projects,'data_definition':data_definition,
+    response = render(request, 'reports/projects_public_view.html', {'projects': projects,'data_definition':data_definition,
                   'projectsData': projectsData, "missions": missions, "communityPartners": communityPartners, "campusPartners":campusPartners})
 
-
+    view_keys['proj'] = learn_cache_key(request, response)
+    return response
 # List of community Partners Public View (Vineeth version)
 
 def communityPublicReport(request):
