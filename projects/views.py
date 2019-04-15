@@ -140,6 +140,8 @@ def proj_view_user(request):
     return render(request, 'projects/Projectlist.html', {'project': projects_list,'data_definition':data_definition})
 
 
+view_keys = {}
+
 @login_required()
 # @campuspartner_required()
 
@@ -458,7 +460,7 @@ def SearchForProjectAdd(request,pk):
 
 
 # List Projects for Public View
-timeout = 600 # 10 min
+timeout = None
 
 @cache_page(timeout)
 def projectsPublicReport(request):
