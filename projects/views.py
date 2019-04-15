@@ -144,6 +144,7 @@ def proj_view_user(request):
 # @campuspartner_required()
 
 def project_total_Add(request):
+    cache.delete(view_keys['proj']) 
     mission_details = modelformset_factory(ProjectMission, form=ProjectMissionFormset)
     secondary_mission_details = modelformset_factory(ProjectMission, extra=1, form=ScndProjectMissionFormset)
     proj_comm_part = modelformset_factory(ProjectCommunityPartner, extra=1, form=AddProjectCommunityPartnerForm)
@@ -263,7 +264,7 @@ def project_total_Add(request):
                             'camp_part': list_camp_part_names
                             }
                     projects_list.append(data)
-                    cache.delete(view_keys['proj']) 
+                    
             return render(request, 'projects/projectadd_done.html', {'project': projects_list})
     else:
         month=datetime.datetime.now() .month
