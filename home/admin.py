@@ -3,9 +3,8 @@ from .models import User
 from .models import Contact, MissionArea, HouseholdIncome, DataDefinition,DataDefinitionGroup
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 #from django.contrib.admin import AdminSite
-from import_export import resources, fields
+from import_export import resources
 from import_export.admin import ImportExportModelAdmin
-from simple_history.admin import SimpleHistoryAdmin
 
 class UserResource(resources.ModelResource):
 
@@ -14,7 +13,7 @@ class UserResource(resources.ModelResource):
 
 
 @admin.register(User)
-class UserAdmin(SimpleHistoryAdmin, ImportExportModelAdmin):
+class UserAdmin(ImportExportModelAdmin):
     """Define admin model for custom User model with no email field."""
 
     fieldsets = (
@@ -52,7 +51,7 @@ class HouseholdIncomeResource(resources.ModelResource):
     class Meta:
         model = HouseholdIncome
 
-class HouseholdIncomeAdmin(SimpleHistoryAdmin, ImportExportModelAdmin):
+class HouseholdIncomeAdmin(ImportExportModelAdmin):
     resource_class = HouseholdIncomeResource
     list_display = ('county', 'median_income')
     search_fields = ('county', )
@@ -71,9 +70,9 @@ class DataDefinitionResource(resources.ModelResource):
     class Meta:
         model = DataDefinition
 
-class DataDefinitionList(SimpleHistoryAdmin, ImportExportModelAdmin):
+class DataDefinitionList(ImportExportModelAdmin):
     list_display = ('title','description','group')
-    search_fields = ('title','group__group')
+    search_fields = ('title',)
     resource_class = DataDefinitionResource
 
 
@@ -84,18 +83,15 @@ class DataDefinitionList(SimpleHistoryAdmin, ImportExportModelAdmin):
 #     search_fields = ('county', )
 
 class ContactResource(resources.ModelResource):
-    community_partner = fields.Field(attribute='community_partner', column_name="Community Partner")
-    campus_partner = fields.Field(attribute='campus_partner', column_name="Campus Partner")
-    
+
     class Meta:
         model = Contact
-        fields = ('first_name', 'last_name', 'work_phone', 'cell_phone', 'email_id', 'contact_type','community_partner', 'campus_partner')
 
-class ContactAdmin(SimpleHistoryAdmin, ImportExportModelAdmin):
+class ContactAdmin(ImportExportModelAdmin):
     resource_class = ContactResource
     list_display = ('first_name', 'last_name', 'work_phone', 'cell_phone', 'email_id', 'contact_type','community_partner', 'campus_partner')
 
-    search_fields = ('first_name', 'last_name', 'email_id', 'contact_type', 'community_partner__name', 'campus_partner__name')
+    search_fields = ('first_name', 'last_name', 'email_id', 'contact_type', 'community_partner', 'campus_partner')
 
 
 

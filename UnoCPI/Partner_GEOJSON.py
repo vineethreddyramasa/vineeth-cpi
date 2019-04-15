@@ -1,23 +1,21 @@
 import pandas as pd
 import googlemaps
 import json
-import boto3
 import datetime
 from pandas import DataFrame
 import logging
 import os
 from shapely.geometry import shape, Point
 import psycopg2
-from django.conf import settings
-from UnoCPI import settings
-from googlemaps import Client
+#TODO - MAP THE DATABASE CREDENTIALS USING ENV VARIABLES
+#Get lat long details of all US counties in json format
 
 dirname = os.path.dirname(__file__)
-county_file = os.path.join(dirname,'../home/static/GEOJSON/USCounties_final.geojson')
-district_file = os.path.join(dirname,'../home/static/GEOJSON/ID2.geojson')
-output_filename = os.path.join(dirname,'../home/static/GEOJSON/Partner.geojson') #The file will be saved under static/GEOJSON
+county_file = os.path.join(dirname,'home/static/GEOJSON/USCounties_final.geojson')
+district_file = os.path.join(dirname,'home/static/GEOJSON/ID2.geojson')
+output_filename = os.path.join(dirname,'home/static/GEOJSON/Partner.geojson') #The file will be saved under static/GEOJSON
 currentDT = datetime.datetime.now()
-
+print("You are here after a great difficult time!")
 with open(county_file) as f:
     geojson1 = json.load(f)
 county = geojson1["features"]
@@ -27,14 +25,24 @@ with open(district_file) as f:
 district = geojson["features"]
 logger=logging.getLogger("UNO CPI Application")
 
-#setup connection to database
-conn =   psycopg2.connect(user=settings.DATABASES['default']['USER'],
-                              password=settings.DATABASES['default']['PASSWORD'],
-                              host=settings.DATABASES['default']['HOST'],
-                              port=settings.DATABASES['default']['PORT'],
-                              database=settings.DATABASES['default']['NAME'],
+#setup connection to database --LOCAL
+# conn = psycopg2.connect("dbname=postgres user=postgres password=admin")
+
+# CAT STAGING
+conn = psycopg2.connect(user="fhhzsyefbuyjdp",
+                              password="e13f9084680555f19d5c0d2d48dd59d4b8b7a2fcbd695b47911335b514369304",
+                              host="ec2-75-101-131-79.compute-1.amazonaws.com",
+                              port="5432",
+                              database="dal99elrltiq5q",
                               sslmode="require")
 
+#setup connection to database --SERVER
+# conn = psycopg2.connect(user= "nbzsljiyoqyakc",
+#                         password="56c6e80a45b37276d84917e4258a7798e2df7c1ec6eee012d160edc9de2ce6c1",
+#                         host="ec2-54-227-241-179.compute-1.amazonaws.com",
+#                         port="5432",
+#                         database="d46q2igt2d4vbg",
+#                         sslmode="require")
 
 if (conn):
     logger.info("Connection Successful!")
@@ -45,7 +53,8 @@ logger.info("Get all the Community Partners from the Database")
 
 # Get all the Community Partners from the database
 dfCommunity = pd.read_sql_query(
-    "SELECT pc.name as Community_Partner,pc.address_line1, pc.address_line2, pc.city, pc.state,pc.zip, hm.mission_name ,p.mission_type, pc.legislative_district,pc.median_household_income, pc2.community_type,pc.website_url FROM partners_communitypartner PC join partners_communitypartnermission p on PC.id = p.community_partner_id join home_missionarea hm on p.mission_area_id = hm.id join partners_communitytype pc2 on PC.community_type_id = pc2.id where  (pc.address_line1 not in ('','NA','N/A') or pc.city not in ('','NA','N/A') or pc.state not in ('','NA','N/A')) and lower(p.mission_type) = 'primary'",con=conn)
+    "SELECT pc.name as Community_Partner,pc.address_line1, pc.address_line2, pc.city, pc.state,pc.zip, hm.mission_name ,p.mission_type, pc.legislative_district,pc.median_household_income, pc2.community_type,pc.website_url FROM partners_communitypartner PC join partners_communitypartnermission p on PC.id = p.community_partner_id join home_missionarea hm on p.mission_area_id = hm.id join partners_communitytype pc2 on PC.community_type_id = pc2.id",
+    con=conn)
 if len(dfCommunity) == 0:
     logger.critical("No Community Partners fetched from the Database on " + str(currentDT))
 else:
@@ -61,7 +70,7 @@ else:
     logger.info(repr(len(dfProjects)) + "Projects are in the Database as of " + str(currentDT))
 conn.close()
 
-gmaps = Client(key=settings.GOOGLE_MAPS_API_KEY)
+gmaps = googlemaps.Client(key='AIzaSyBH5afRK4l9rr_HOR_oGJ5Dsiw2ldUzLv0')
 
 if(gmaps):
     logger.info("GMAPS API works!")
@@ -121,10 +130,9 @@ def feature_from_row(Community, Address, Mission, MissionType, City, CommunityTy
                 campuslist.append(campuses[n])
             if (projects[n] not in projectList):
                 projectList.append(projects[n])
-                count +=1
             if (colleges[n] not in collegeList):
                 collegeList.append(colleges[n])
-
+            count += 1
     feature['properties']['Number of projects'] = count
     feature['properties']['Campus Partner'] = campuslist
     feature['properties']['Academic Year'] = yearlist
@@ -152,15 +160,3 @@ with open(output_filename, 'w') as output_file:
 
 # Log when the Script ran
 logger.info("Community Partners of  " + repr(len(dfCommunity)) + " records are generated at " + str(currentDT))
-
-
-#writing into amazon aws s3
-ACCESS_ID=settings.AWS_ACCESS_KEY_ID
-ACCESS_KEY=settings.AWS_SECRET_ACCESS_KEY
-s3 = boto3.resource('s3',
-         aws_access_key_id=ACCESS_ID,
-         aws_secret_access_key= ACCESS_KEY)
-
-s3.Object(settings.AWS_STORAGE_BUCKET_NAME, 'geojson/Partner.geojson').put(Body=format(jsonstring))
-
-print("Partner GEOJSON file written having total records of " +repr(len(dfCommunity))+" in S3 bucket "+settings.AWS_STORAGE_BUCKET_NAME +" at " +str(currentDT))
