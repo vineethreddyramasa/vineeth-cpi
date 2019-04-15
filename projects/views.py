@@ -30,6 +30,7 @@ from django.shortcuts import render_to_response
 from django.views.decorators.cache import cache_page
 from django.core.cache import cache
 from django.utils.cache import learn_cache_key
+import os
 
 @login_required()
 @communitypartner_required()
@@ -399,6 +400,7 @@ def project_edit_new(request,pk):
 @login_required()
 def SearchForProject(request):
     
+    os.system('cache.clear()')
     
     
     data_definition=DataDefinition.objects.all()
