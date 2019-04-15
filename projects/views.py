@@ -263,7 +263,7 @@ def project_total_Add(request):
                             'camp_part': list_camp_part_names
                             }
                     projects_list.append(data)
-                    cache.delete(view_keys['index']) 
+                    cache.delete(view_keys['proj']) 
             return render(request, 'projects/projectadd_done.html', {'project': projects_list})
     else:
         month=datetime.datetime.now() .month
