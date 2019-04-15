@@ -6,16 +6,11 @@ from django.conf import settings
 
 urlpatterns = [
 
-   #path('', views.partnerdata, name='home'),
-   path('home',views.partnerdata, name='home'),
-   #path('', views.MapHome, name='MapHome'),
    path('campusHome',views.campusHome, name='campusHome'),
    path('CommunityHome',views.CommunityHome, name='CommunityHome'),
    path('partners/',views.partners,name='partners'),
    path('map', views.countyData, name='map'),
    path('definitions',views.Definitions,name='Definitions'),
-   path('districtmap', views.districtdata, name='districtmap'),
-   path('projectmap', views.projectdata, name='projectmap'),
    path('registerCampusPartnerUser/', views.registerCampusPartnerUser, name='registerCampusPartnerUser'),
    path('registerCommunityPartnerUser/', views.registerCommunityPartnerUser, name='registerCommunityPartnerUser'),
    path('signupuser/registerCampusPartnerUser/', views.registerCampusPartnerUser, name='registerCampusPartnerUser'),
@@ -30,15 +25,17 @@ urlpatterns = [
    path('projectInfo/', views.project_partner_info, name='project_partner_info'),
    path('engageType/', views.engagement_info, name='engagement_info'),
    path('engagementtypechart2/' , views.EngagementType_Chart, name = 'EngagementType_Chart'),
-   path('countProjectCP/', views.unique_count, name='unique_count'),
    path('AdminHome/', views.AdminHome , name= 'adminhome'),
    path('Adminframe/', views.Adminframe, name='Adminframe'),
+   path('recentchanges/', views.recentchanges, name='recentchanges' ),
    path('Contactus',views.Contactus,name='Contactus'),
    path('thanks/', views.thanks, name='thanks'),
-   path('googleprojectmap',views.googleprojectdata, name='googleprojectmap'),
-   path('googleDistrictmap',views.googleDistrictdata, name='googleDistrictmap'),
-   path('googlehomepage',views.googlepartnerdata, name='googlehomepage'),
-   path('googlemap',views.googlemapdata, name='googlemap')
-
-
+   path('inviteCommunityPartnerUser/', views.invitecommunityPartnerUser, name='invitecommunityPartnerUser'),
+   path('projectMap', views.googleprojectdata, name='googleprojectmap'),
+   path('legislativeDistrict', views.googleDistrictdata, name='googleDistrictmap'),
+   path('communityPartner', views.googlepartnerdata, name='googlehomepage'),
+   path('communityPartnerType', views.googlemapdata, name='googlemap'),
+   path('activate/<str:uidb64>/<str:token>', views.activate, name='activate'),
+   path('inviteCommPartner/<str:uidb64>/<str:token>', views.registerCommPartner, name='inviteCommPartner'),
+   path('inviteCommPartner/<str:uidb64>/', views.registerCommPartnerComplete, name='inviteCommPartnerComplete')
 ]

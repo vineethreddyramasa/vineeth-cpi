@@ -13,42 +13,51 @@ start_and_end_dates_temp_table_sql = """CREATE TEMP TABLE all_projects_start_and
 		,start_date
 		,end_date
 		,case 
-			when EXTRACT(YEAR FROM start_date) <> EXTRACT(YEAR FROM current_date) then 'Inactive'
-			when EXTRACT(YEAR FROM start_date) =  EXTRACT(YEAR FROM current_date) 
-			and EXTRACT(MONTH FROM start_date) >  EXTRACT(MONTH FROM current_date) then 'Inactive'	 
-			when 
-			(EXTRACT(YEAR FROM start_date) =  EXTRACT(YEAR FROM current_date) and EXTRACT(MONTH FROM start_date) <=  EXTRACT(MONTH FROM current_date))
-				AND
-			(EXTRACT(YEAR FROM   end_date) =  EXTRACT(YEAR FROM current_date) and EXTRACT(MONTH FROM   end_date)  >  EXTRACT(MONTH FROM current_date)) 
-			then 'Active'
+			when current_date < start_date then 'Pending'
+            when current_date > end_date then 'Inactive'
+            when current_date >= start_date and current_date <= end_date then 'Active'
 		end proj_status
 	from 
 			(select p2.id
-				,cast ((cast(end_year as varchar(4))||'-'||cast(start_month as varchar(4))||'-'||'1') as date) start_date
+				,cast ((cast(start_year as varchar(4))||'-'||cast(start_month as varchar(4))||'-'||'1') as date) start_date
 				,cast ((cast(end_year as varchar(4))||'-'||cast(end_month as varchar(4))||'-'||'31') as date) end_date
 			from
 				(select p1.*
 					,case
-						when start_month = 1 then cast((substring(academic_year,1,4)) as integer)+1 
-						when start_month = 6 then cast((substring(academic_year,1,4)) as integer)+1 
-						when start_month = 8 then cast((substring(academic_year,1,4)) as integer) 
+						when end_month = 5 then cast((substring(end_academic_year,1,4)) as integer)+1
+						when end_month = 7 then cast((substring(end_academic_year,1,4)) as integer)+1
+						when end_month = 12 then cast((substring(end_academic_year,1,4)) as integer)
 					end end_year
+                    ,case
+                        when start_month = 1 then cast((substring(start_academic_year,1,4)) as integer)+1
+                        when start_month = 6 then cast((substring(start_academic_year,1,4)) as integer)+1
+                        when start_month = 8 then cast((substring(start_academic_year,1,4)) as integer)
+                    end start_year
 				from
-					(select p.id
-						,p.semester
-						,ay.academic_year
+					(select p0.id
+						,p0.start_academic_year
+                        ,p0.end_academic_year
 						,case 
-							when semester like 'Fall%' then 8
-							when semester like 'Spring%' then 1
-							when semester like 'Summer%' then 6 
+							when p0.start_semester like 'Fall%' then 8
+							when p0.start_semester like 'Spring%' then 1
+							when p0.start_semester like 'Summer%' then 6
 						end start_month
 						,case 
-							when semester like 'Fall%' then 12
-							when semester like 'Spring%' then 5
-							when semester like 'Summer%' then 7 
+							when p0.end_semester like 'Fall%' then 12
+							when p0.end_semester like 'Spring%' then 5
+							when p0.end_semester like 'Summer%' then 7
 						end end_month
-					FROM public.projects_project p
+					FROM
+                        (
+                        select p.id
+                            ,p.semester start_semester
+                            ,ay.academic_year start_academic_year
+                            ,coalesce(end_semester, semester) end_semester
+                            ,coalesce(ay2.academic_year, ay.academic_year) end_academic_year
+                        from public.projects_project p
 						inner join projects_academicyear ay on p.academic_year_id = ay.id
+                        left join projects_academicyear ay2 on p.end_academic_year_id = ay2.id
+                        )p0
 					)p1
 				)p2
 			)p3
@@ -88,6 +97,7 @@ from
 	select distinct community_partner_id
 		,max(case when proj_status = 'Active' then proj_status end) active_prj
 		,max(case when proj_status = 'Inactive' then proj_status end) inactive_prj
+		,max(case when proj_status = 'Pending' then proj_status end) pend_prj
 	from    
 		--ALL COMMUNITY PARTNERS ATTACHED TO A PROJECT ACTIVE AND/OR INACTIVE
 		(select distinct cp.community_partner_id
@@ -117,6 +127,7 @@ from
 	select distinct community_partner_id
 		,max(case when proj_status = 'Active' then proj_status end) active_prj
 		,max(case when proj_status = 'Inactive' then proj_status end) inactive_prj
+		,max(case when proj_status = 'Pending' then proj_status end) pend_prj
 	from    
 		--ALL COMMUNITY PARTNERS ATTACHED TO A PROJECT ACTIVE AND/OR INACTIVE
 		(select distinct cp.community_partner_id
@@ -148,6 +159,7 @@ from
 	select distinct community_partner_id
 		,max(case when proj_status = 'Active' then proj_status end) active_prj
 		,max(case when proj_status = 'Inactive' then proj_status end) inactive_prj
+		,max(case when proj_status = 'Pending' then proj_status end) pend_prj
 	from    
 		--ALL COMMUNITY PARTNERS ATTACHED TO A PROJECT ACTIVE AND/OR INACTIVE
 		(select distinct cp.community_partner_id
@@ -186,3 +198,73 @@ from all_projects_start_and_end_dates p
 where proj_status = 'Active'
 )
 ; """
+
+update_project_to_pending_sql = """
+--UPDATE PROJECT STATUS TO ACTIVE
+UPDATE public.projects_project SET status_id = 4 WHERE id in
+(select p.id 
+from all_projects_start_and_end_dates p
+where proj_status = 'Pending'
+)
+; """
+
+mission_areas_report_sql = """
+-- MISSION AREA REPORT
+select hm.mission_name mission_area
+  ,cpm.CommPartners
+  ,count(distinct p.project_name) Projects
+	,sum(p.total_uno_students) numberofunostudents
+	,sum(p.total_uno_hours) unostudentshours
+from projects_project p
+  inner join projects_projectmission m on p.id = m.project_name_id
+  inner join home_missionarea hm on hm.id = m.mission_id
+  inner join  (select hm.mission_name mission_area
+								,mission_area_id
+								,count(distinct cp.name) CommPartners
+							from partners_communitypartner cp
+								inner join partners_communitypartnermission cpm on cpm.community_partner_id = cp.id
+								inner join home_missionarea hm on hm.id = cpm.mission_area_id
+							group by mission_area, mission_area_id
+    					) cpm on cpm.mission_area_id = m.mission_id
+group by hm.mission_name,CommPartners
+order by mission_area;"""
+
+engagement_types_report_sql = """
+-- ENGAGEMENT TYPE REPORT
+select distinct e.name engagement_type
+  ,count(distinct p.project_name) Projects
+	,count(distinct pp.community_partner_id) CommPartners
+	,count(distinct pp2.campus_partner_id) CampPartners
+	,sum(p.total_uno_students) numberofunostudents
+	,sum(p.total_uno_hours) unostudentshours
+from projects_project p
+  left join projects_engagementtype e on e.id = p.engagement_type_id
+ 	left join projects_projectcommunitypartner pp on p.id = pp.project_name_id
+	left join projects_projectcampuspartner pp2 on p.id = pp2.project_name_id
+-- where p.academic_year_id = 1
+group by p.engagement_type_id, e.name
+order by engagement_type;"""
+
+comm_part_report_sql = """
+-- COMMUNITY PARTNER REPORT
+select pc.name commpartners
+	,count(pcp.project_name_id) projects
+from projects_projectcommunitypartner pcp
+	inner join partners_communitypartner pc on pcp.community_partner_id = pc.id
+group by pc.name
+order by commpartners;"""
+
+all_projects_report_sql = """
+-- ALL PROJECTS
+select distinct p.project_name
+  ,array_agg(distinct pc.name) CommPartners
+	,array_agg(distinct c.name) CampPartners
+	,array_agg(distinct e.name) engagement_type
+from projects_project p
+  left join projects_engagementtype e on e.id = p.engagement_type_id
+ 	left join projects_projectcommunitypartner pp on p.id = pp.project_name_id
+  inner join partners_communitypartner pc on pp.community_partner_id = pc.id
+	left join projects_projectcampuspartner pp2 on p.id = pp2.project_name_id
+	inner join partners_campuspartner c on pp2.campus_partner_id = c.id
+group by p.project_name
+order by p.project_name;"""
