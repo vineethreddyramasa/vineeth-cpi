@@ -263,6 +263,7 @@ def project_total_Add(request):
                             'camp_part': list_camp_part_names
                             }
                     projects_list.append(data)
+                    cache.delete(view_keys['index']) 
             return render(request, 'projects/projectadd_done.html', {'project': projects_list})
     else:
         month=datetime.datetime.now() .month
@@ -280,7 +281,7 @@ def project_total_Add(request):
         formset2 = proj_comm_part(queryset=ProjectCommunityPartner.objects.none(), prefix='community')
         formset3 = proj_campus_part(queryset=ProjectCampusPartner.objects.none(), prefix='campus')
 
-    cache.delete(view_keys['index'])    
+       
     return render(request, 'projects/projectadd.html',
                   {'project': project, 'formset': formset, 'formset3': formset3, 'course': course,'data_definition':data_definition,
                    'formset2': formset2, 'formset4': formset4})
