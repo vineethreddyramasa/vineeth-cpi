@@ -49,8 +49,6 @@ INSTALLED_APPS = [
     'bootstrapform',
     'django_filters',
     'import_export',
-    'logentry_admin',
-    'simple_history',
 
     'wagtail.contrib.forms',
     'wagtail.contrib.redirects',
@@ -81,7 +79,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'wagtail.core.middleware.SiteMiddleware',
     'wagtail.contrib.redirects.middleware.RedirectMiddleware',
-    'simple_history.middleware.HistoryRequestMiddleware',
 ]
 
 
@@ -98,7 +95,6 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'home.context_processors.global_settings',
             ],
         },
     },
@@ -112,17 +108,27 @@ WSGI_APPLICATION = 'UnoCPI.wsgi.application'
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'd589ifrcnlenm',
+#         'USER': 'uegjfonsecemyh',
+#         'PASSWORD': '5d8546e4236619949c6d7898b62611ab7e27f971a27b83bffff802d420b24a6c',
+#         'HOST': 'ec2-107-20-185-27.compute-1.amazonaws.com',
+#         'PORT': '5432',
+
+#     }
+# }
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DB_NAME'),
-        'USER': os.environ.get('DB_USER'),
-        'PASSWORD':os.environ.get('DB_PASSWORD'),
-        'HOST': os.environ.get('DB_HOST'),
-        'PORT': os.environ.get('DB_PORT'),
+        'NAME': 'd9ovk44blla86g',
+        'USER': 'solhyroepfbcew',
+        'PASSWORD': 'c7dbaeab1015aa207009f9581fbe7c044dce9c7f575e1a688a4a74451fb60150',
+        'PORT': '5432',
+        'HOST': 'ec2-54-225-227-125.compute-1.amazonaws.com',
     }
 }
-
 
 
 
@@ -200,10 +206,10 @@ LOGIN_URL = reverse_lazy('login')
 ## MEDIA_URL = '/media/'
 
 ##
-EMAIL_HOST = os.environ.get('MAILGUN_SMTP_SERVER')
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
-EMAIL_PORT = os.environ.get('MAILGUN_SMTP_PORT')
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'capstoneteam2018cpi@gmail.com'
+EMAIL_HOST_PASSWORD = 'capstone2018'
+EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
 
@@ -213,11 +219,13 @@ EMAIL_USE_TLS = True
 #STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # Internationalization
+try:
+    from .local_settings import *
+except ImportError:
+    pass
 
 WAGTAIL_SITE_NAME = 'UNO-CPI'
 
-
-GOOGLE_MAPS_API_KEY = os.environ.get('GOOGLE_MAPS_API_KEY')
 
 AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
 AWS_ACCESS_KEY_ID=os.environ.get('AWS_ACCESS_KEY_ID')
@@ -227,7 +235,3 @@ AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
 MEDIA_URL = "https://%s/" % AWS_S3_CUSTOM_DOMAIN
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
-try:
-    from .local_settings import *
-except ImportError:
-    pass

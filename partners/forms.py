@@ -75,19 +75,18 @@ class CampusPartnerContactForm(forms.ModelForm):
 
     def clean_email_id(self):
         email = self.cleaned_data['email_id']
-        if ".edu" not in email:
-            raise forms.ValidationError("Please use your campus email (.edu) for the registration of a Campus Partner.")
+        if "edu" != email.split("@")[1].split('.')[1]:
+            raise forms.ValidationError("Please use .edu email ")
         return email
 
 class CommunityPartnerForm(forms.ModelForm):
-    website_url = forms.URLField(max_length=200,label='Your Website',initial="http://", required=False)
     class Meta:
         model = CommunityPartner
         fields = ('name', 'website_url', 'community_type', 'k12_level', 'address_line1', 'city','state',
                    'zip','county','country')
         labels = {
             'name': ('Community Partner Organization'),
-            # 'website_url': ('Website'),
+            'website_url': ('Website'),
             'community_type': ('Community Type'),
             'k12_level':('K12 Level'),
             'address_line1': ('Address Line 1'),
@@ -99,11 +98,11 @@ class CommunityPartnerForm(forms.ModelForm):
 
         }
 
-    def clean_name(self):
-        name = self.cleaned_data['name']
-        if CommunityPartner.objects.filter(name__icontains=name).exists():
-            raise forms.ValidationError('Community partner with this Name already exists.')
-        return name
+    # def clean_name(self):
+    #     name = self.cleaned_data['name']
+    #     if CommunityPartner.objects.filter(name__icontains=name).exists():
+    #         raise forms.ValidationError('Community partner with this Name already exists.')
+    #     return name
 
     # def clean_country(self):
     #         name = self.cleaned_data['country']

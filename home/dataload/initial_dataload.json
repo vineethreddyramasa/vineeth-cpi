@@ -179,14 +179,6 @@
         }
     },
     {
-        "model": "projects.status",
-        "pk": 4,
-        "fields": {
-            "name": "Pending",
-            "description": null
-        }
-    },
-    {
         "model": "projects.engagementtype",
         "pk": 1,
         "fields": {

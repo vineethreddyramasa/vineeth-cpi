@@ -11,7 +11,62 @@ from wagtail.images.edit_handlers import ImageChooserPanel
 from .blocks import BaseStreamBlock
 from wagtail.contrib.routable_page.models import RoutablePageMixin, route
 from wagtail.snippets.models import register_snippet
-from simple_history.models import HistoricalRecords
+
+@register_snippet
+class Campus_Partner_Snippet(models.Model):
+    text = models.CharField(max_length=255)
+
+    panels = [
+        FieldPanel('text'),
+    ]
+
+    def __str__(self):
+        return self.text
+
+    class Meta:
+        verbose_name = "Campus Partner Snippet"
+
+@register_snippet
+class Campus_Partner_User_Snippet(models.Model):
+    text = models.CharField(max_length=255)
+
+    panels = [
+        FieldPanel('text'),
+    ]
+
+    def __str__(self):
+        return self.text
+
+    class Meta:
+        verbose_name = "Campus Partner User Snippet"
+
+@register_snippet
+class Community_Partner_Snippet(models.Model):
+    text = models.CharField(max_length=255)
+
+    panels = [
+        FieldPanel('text'),
+    ]
+
+    def __str__(self):
+        return self.text
+
+    class Meta:
+        verbose_name = "Community Partner Snippet"
+
+@register_snippet
+class Community_Partner_User_Snippet(models.Model):
+    text = models.CharField(max_length=255)
+
+    panels = [
+        FieldPanel('text'),
+    ]
+
+    def __str__(self):
+        return self.text
+
+    class Meta:
+        verbose_name = "Community Partner User Snippet"
 
 class HomePage(Page):
 
@@ -26,7 +81,7 @@ class HomePage(Page):
     )
     hero_text = models.CharField(
         max_length=255,
-        help_text='Write an introduction for the Site'
+        help_text='Write an introduction for the bakery'
         )
 
     # Body section of the HomePage
@@ -316,7 +371,6 @@ class User(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
     objects = UserManager()
-    history = HistoricalRecords()
 
 
 class Contact(models.Model):
@@ -333,7 +387,6 @@ class Contact(models.Model):
     contact_type = models.CharField(max_length=15, choices=contacttype_choices, default='Select')
     community_partner = models.ForeignKey('partners.CommunityPartner', on_delete=models.CASCADE,null=True,blank=True)
     campus_partner = models.ForeignKey('partners.CampusPartner', on_delete=models.CASCADE, null=True, blank=True)
-    history = HistoricalRecords()
 
     def __str__(self):
         return str(self.email_id)
@@ -357,7 +410,6 @@ class HouseholdIncome(models.Model):
     median_income = models.IntegerField(null=False, blank=False)
     margin_error = models.IntegerField(null=False, blank=False)
     rank = models.IntegerField(null=False, blank=False)
-    history = HistoricalRecords()
 
     def __str__(self):
         return str(self.county)
@@ -373,175 +425,6 @@ class DataDefinition(models.Model):
     description = models.CharField(max_length=1000)
     group = models.ForeignKey('DataDefinitionGroup', on_delete=models.CASCADE,default=True)
     is_active = models.BooleanField(default=False)
-    history = HistoricalRecords()
 
     def __str__(self):
         return str(self.title)
-
-@register_snippet
-class Campus_Partner_Snippet(models.Model):
-    text = models.CharField(max_length=1000)
-
-    panels = [
-        FieldPanel('text'),
-    ]
-
-    def __str__(self):
-        return self.text
-
-    class Meta:
-        verbose_name = "Campus Partner Snippet"
-
-@register_snippet
-class Campus_Partner_User_Snippet(models.Model):
-    text = models.CharField(max_length=1000)
-
-    panels = [
-        FieldPanel('text'),
-    ]
-
-    def __str__(self):
-        return self.text
-
-    class Meta:
-        verbose_name = "Campus Partner User Snippet"
-
-@register_snippet
-class Community_Partner_Snippet(models.Model):
-    text = models.CharField(max_length=1000)
-
-    panels = [
-        FieldPanel('text'),
-    ]
-
-    def __str__(self):
-        return self.text
-
-    class Meta:
-        verbose_name = "Community Partner Snippet"
-
-@register_snippet
-class Community_Partner_User_Snippet(models.Model):
-    text = models.CharField(max_length=1000)
-
-    panels = [
-        FieldPanel('text'),
-    ]
-
-    def __str__(self):
-        return self.text
-
-    class Meta:
-        verbose_name = "Community Partner User Snippet"
-
-@register_snippet
-class Public_Project_Report_Snippet(models.Model):
-    text = models.CharField(max_length=1000)
-
-    panels = [
-        FieldPanel('text'),
-    ]
-
-    def __str__(self):
-        return self.text
-
-    class Meta:
-        verbose_name = "Public Project Report Snippet"
-
-@register_snippet
-class Private_Project_Report_Snippet(models.Model):
-    text = models.CharField(max_length=1000)
-
-    panels = [
-        FieldPanel('text'),
-    ]
-
-    def __str__(self):
-        return self.text
-
-    class Meta:
-        verbose_name = "Private Project Report Snippet"
-
-@register_snippet
-class Community_Public_Report_Snippet(models.Model):
-    text = models.CharField(max_length=1000)
-
-    panels = [
-        FieldPanel('text'),
-    ]
-
-    def __str__(self):
-        return self.text
-
-    class Meta:
-        verbose_name = "Community Public Report Snippet"
-
-@register_snippet
-class Community_Private_Report_Snippet(models.Model):
-    text = models.CharField(max_length=1000)
-
-    panels = [
-        FieldPanel('text'),
-    ]
-
-    def __str__(self):
-        return self.text
-
-    class Meta:
-        verbose_name = "Community Private Report Snippet"
-
-@register_snippet
-class Engagement_Types_Report_Snippet(models.Model):
-    text = models.CharField(max_length=1000)
-
-    panels = [
-        FieldPanel('text'),
-    ]
-
-    def __str__(self):
-        return self.text
-
-    class Meta:
-        verbose_name = "Engagement Types Report Snippet"
-
-@register_snippet
-class Mission_Areas_Report_Snippet(models.Model):
-    text = models.CharField(max_length=1000)
-
-    panels = [
-        FieldPanel('text'),
-    ]
-
-    def __str__(self):
-        return self.text
-
-    class Meta:
-        verbose_name = "Mission Areas Report Snippet"
-
-@register_snippet
-class Mission_Areas_Chart_Snippet(models.Model):
-    text = models.CharField(max_length=1000)
-
-    panels = [
-        FieldPanel('text'),
-    ]
-
-    def __str__(self):
-        return self.text
-
-    class Meta:
-        verbose_name = "Mission Areas Charts Snippet"
-
-@register_snippet
-class Engagement_Types_Chart_Snippet(models.Model):
-    text = models.CharField(max_length=1000)
-
-    panels = [
-        FieldPanel('text'),
-    ]
-
-    def __str__(self):
-        return self.text
-
-    class Meta:
-        verbose_name = "Engagement Types Chart Snippet"
