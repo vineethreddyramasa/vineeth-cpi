@@ -398,7 +398,7 @@ def project_edit_new(request,pk):
 @login_required()
 @login_required()
 def SearchForProject(request):
-    cache.delete(view_keys['proj']) 
+    cache.clear() 
     data_definition=DataDefinition.objects.all()
 
     projects_list = []
