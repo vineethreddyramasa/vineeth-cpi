@@ -28,6 +28,7 @@ import datetime
 gmaps = googlemaps.Client(key='AIzaSyBH5afRK4l9rr_HOR_oGJ5Dsiw2ldUzLv0')
 from django.shortcuts import render_to_response
 from django.views.decorators.cache import cache_page
+from django.core.cache import cache
 
 @login_required()
 @communitypartner_required()
@@ -279,6 +280,7 @@ def project_total_Add(request):
         formset2 = proj_comm_part(queryset=ProjectCommunityPartner.objects.none(), prefix='community')
         formset3 = proj_campus_part(queryset=ProjectCampusPartner.objects.none(), prefix='campus')
 
+    cache.delete(view_keys['index'])    
     return render(request, 'projects/projectadd.html',
                   {'project': project, 'formset': formset, 'formset3': formset3, 'course': course,'data_definition':data_definition,
                    'formset2': formset2, 'formset4': formset4})
