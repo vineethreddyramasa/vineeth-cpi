@@ -398,7 +398,7 @@ def project_edit_new(request,pk):
 @login_required()
 @login_required()
 def SearchForProject(request):
-    cache.delete_many(keys) 
+    cache.clear() 
     data_definition=DataDefinition.objects.all()
 
     projects_list = []
@@ -463,9 +463,7 @@ def SearchForProjectAdd(request,pk):
 # List Projects for Public View
 timeout = None
 
-
-keys = set()
-@cache_page(60 * 15, "blog" )
+@cache_page(timeout)
 def projectsPublicReport(request):
     projects = ProjectFilter(request.GET, queryset=Project.objects.all())
     missions = ProjectMissionFilter(request.GET, queryset=ProjectMission.objects.all())
@@ -524,7 +522,7 @@ def projectsPublicReport(request):
     response = render(request, 'reports/projects_public_view.html', {'projects': projects,'data_definition':data_definition,
                   'projectsData': projectsData, "missions": missions, "communityPartners": communityPartners, "campusPartners":campusPartners})
 
-    keys.add(learn_cache_key(request, response)
+    view_keys['proj'] = learn_cache_key(request, response)
     return response
 # List of community Partners Public View (Vineeth version)
 
