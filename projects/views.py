@@ -147,7 +147,7 @@ view_keys = {}
 # @campuspartner_required()
 
 def project_total_Add(request):
-    cache.delete(view_keys['proj']) 
+    
     mission_details = modelformset_factory(ProjectMission, form=ProjectMissionFormset)
     secondary_mission_details = modelformset_factory(ProjectMission, extra=1, form=ScndProjectMissionFormset)
     proj_comm_part = modelformset_factory(ProjectCommunityPartner, extra=1, form=AddProjectCommunityPartnerForm)
@@ -398,7 +398,7 @@ def project_edit_new(request,pk):
 @login_required()
 @login_required()
 def SearchForProject(request):
-
+    cache.delete(view_keys['proj']) 
     data_definition=DataDefinition.objects.all()
 
     projects_list = []
