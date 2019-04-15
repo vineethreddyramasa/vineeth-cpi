@@ -27,9 +27,6 @@ from django.db.models import Sum
 import datetime
 gmaps = googlemaps.Client(key='AIzaSyBH5afRK4l9rr_HOR_oGJ5Dsiw2ldUzLv0')
 from django.shortcuts import render_to_response
-from django.views.decorators.cache import cache_page
-from django.core.cache import cache
-from django.utils.cache import learn_cache_key
 
 @login_required()
 @communitypartner_required()
@@ -140,8 +137,6 @@ def proj_view_user(request):
 
     return render(request, 'projects/Projectlist.html', {'project': projects_list,'data_definition':data_definition})
 
-
-view_keys = {}
 
 @login_required()
 # @campuspartner_required()
@@ -398,7 +393,7 @@ def project_edit_new(request,pk):
 @login_required()
 @login_required()
 def SearchForProject(request):
-    cache.clear() 
+   
     data_definition=DataDefinition.objects.all()
 
     projects_list = []
@@ -461,9 +456,11 @@ def SearchForProjectAdd(request,pk):
 
 
 # List Projects for Public View
-timeout = None
 
-@cache_page(timeout)
+
+from groupcache.decorators import cache_page_against_model
+
+@cache_page_against_model(Project)
 def projectsPublicReport(request):
     projects = ProjectFilter(request.GET, queryset=Project.objects.all())
     missions = ProjectMissionFilter(request.GET, queryset=ProjectMission.objects.all())
@@ -519,11 +516,10 @@ def projectsPublicReport(request):
                                 data['communityPartner'] = list_comm
         if data:
             projectsData.append(data)
-    response = render(request, 'reports/projects_public_view.html', {'projects': projects,'data_definition':data_definition,
+    
+    return render(request, 'reports/projects_public_view.html', {'projects': projects,'data_definition':data_definition,
                   'projectsData': projectsData, "missions": missions, "communityPartners": communityPartners, "campusPartners":campusPartners})
 
-    view_keys['proj'] = learn_cache_key(request, response)
-    return response
 # List of community Partners Public View (Vineeth version)
 
 def communityPublicReport(request):
