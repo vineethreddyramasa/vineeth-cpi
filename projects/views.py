@@ -29,6 +29,7 @@ gmaps = googlemaps.Client(key='AIzaSyBH5afRK4l9rr_HOR_oGJ5Dsiw2ldUzLv0')
 from django.shortcuts import render_to_response
 from django.views.decorators.cache import cache_page
 from django.core.cache import cache
+from django.utils.cache import learn_cache_key
 
 @login_required()
 @communitypartner_required()
