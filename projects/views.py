@@ -399,8 +399,11 @@ def project_edit_new(request,pk):
 @login_required()
 @login_required()
 def SearchForProject(request):
-    os.system('from django.core.cache import cache')  
+    
+    
     os.system('cache.clear()')
+    def handle(self, *args, **options):
+       cache.clear()
     
     
     data_definition=DataDefinition.objects.all()
