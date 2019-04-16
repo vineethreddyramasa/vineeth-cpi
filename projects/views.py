@@ -302,6 +302,7 @@ def project_edit_new(request,pk):
     #print('print input to edit')
 
     if request.method == 'POST':
+        cache.clear()
         proj_edit = Project.objects.filter(id=pk)
         for x in proj_edit:
             project = ProjectForm2(request.POST or None, instance=x)
@@ -530,7 +531,7 @@ def projectsPublicReport(request):
     view_keys['proj'] = learn_cache_key(request, response)
     return response
 # List of community Partners Public View (Vineeth version)
-
+@cache_page(timeout)
 def communityPublicReport(request):
     community_dict = {}
     community_list = []
@@ -579,6 +580,7 @@ def communityPublicReport(request):
 
 
 # List Projects for Private View
+@cache_page(timeout)
 @admin_required()
 def projectsPrivateReport(request):
     projects = ProjectFilter(request.GET, queryset=Project.objects.all())
@@ -645,7 +647,7 @@ def projectsPrivateReport(request):
     return render(request, 'reports/projects_private_view.html', {'projects': projects,'data_definition':data_definition,
                   'projectsData': projectsData, "missions": missions, "communityPartners": communityPartners, "campusPartners":campusPartners})
 
-
+@cache_page(timeout)
 @login_required()
 def communityPrivateReport(request):
     community_dict = {}
