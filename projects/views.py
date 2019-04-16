@@ -268,6 +268,7 @@ def project_total_Add(request):
                             'camp_part': list_camp_part_names
                             }
                     projects_list.append(data)
+                    cache.clear()
                     
             return render(request, 'projects/projectadd_done.html', {'project': projects_list})
     else:
@@ -406,12 +407,9 @@ def SearchForProject(request):
 
     if request.method == "GET":
         
-        os.system('cache.clear()')
-        print("TEst1")
+        
         cache.clear()
-        print("Test2")
-        os.system(cache.clear())
-        print("Test 3")
+       
         # To get list of all Projects frm the Database
         projects = list(Project.objects.all())
 
