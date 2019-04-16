@@ -469,7 +469,7 @@ def SearchForProjectAdd(request,pk):
 # List Projects for Public View
 timeout = None
 
-@cache_page(timeout)
+# @cache_page(timeout)
 def projectsPublicReport(request):
     projects = ProjectFilter(request.GET, queryset=Project.objects.all())
     missions = ProjectMissionFilter(request.GET, queryset=ProjectMission.objects.all())
