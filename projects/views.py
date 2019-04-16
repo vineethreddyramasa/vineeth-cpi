@@ -155,6 +155,7 @@ def project_total_Add(request):
     proj_campus_part = modelformset_factory(ProjectCampusPartner, extra=1, form=AddProjectCampusPartnerForm)
     data_definition=DataDefinition.objects.all()
     if request.method == 'POST':
+        cache.clear()
         project = ProjectFormAdd(request.POST)
         course = CourseForm(request.POST)
         formset = mission_details(request.POST or None, prefix='mission')
@@ -268,8 +269,7 @@ def project_total_Add(request):
                             'camp_part': list_camp_part_names
                             }
                     projects_list.append(data)
-                    cache.clear()
-                    
+                                        
             return render(request, 'projects/projectadd_done.html', {'project': projects_list})
     else:
         month=datetime.datetime.now() .month
