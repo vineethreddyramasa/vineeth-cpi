@@ -1,4 +1,4 @@
-ofrom decimal import *
+from decimal import *
 from django.db import connection
 from django.http import HttpResponse, HttpResponseRedirect
 from numpy import shape
