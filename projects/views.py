@@ -408,7 +408,7 @@ def SearchForProject(request):
         
         os.system('cache.clear()')
         print("TEst1")
-        clear.cache()
+        cache.clear()
         print("Test2")
         os.system(cache.clear())
         print("Test 3")
