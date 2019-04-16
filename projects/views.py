@@ -1,4 +1,4 @@
-from decimal import *
+ofrom decimal import *
 from django.db import connection
 from django.http import HttpResponse, HttpResponseRedirect
 from numpy import shape
@@ -401,10 +401,7 @@ def project_edit_new(request,pk):
 def SearchForProject(request):
     
     
-    os.system('cache.clear()')
-    def handle(self, *args, **options):
-       cache.clear()
-    
+    os.system('cache.clear()') 
     
     data_definition=DataDefinition.objects.all()
 
