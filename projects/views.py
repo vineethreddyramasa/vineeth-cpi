@@ -400,15 +400,18 @@ def project_edit_new(request,pk):
 @login_required()
 def SearchForProject(request):
     
-    
-    os.system('cache.clear()') 
-    
     data_definition=DataDefinition.objects.all()
 
     projects_list = []
 
     if request.method == "GET":
         
+        os.system('cache.clear()')
+        print("TEst1")
+        clear.cache()
+        print("Test2")
+        os.system(cache.clear())
+        print("Test 3")
         # To get list of all Projects frm the Database
         projects = list(Project.objects.all())
 
