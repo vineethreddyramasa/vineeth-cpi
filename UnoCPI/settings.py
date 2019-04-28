@@ -31,9 +31,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-
-CSRF_COOKIE_DOMAIN = '.herokuapp.com'
-
 # Application definition
 
 INSTALLED_APPS = [
